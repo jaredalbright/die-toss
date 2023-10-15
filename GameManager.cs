@@ -51,12 +51,20 @@ public class GameManager : MonoBehaviour
     }
 
     public void checkPoint() {
-        if (dietracker.checkForScore()) {
+        int pointRet = dietracker.checkForScore();
+        if (pointRet > 0) {
             Debug.Log("Point");
-            int currScore = this.offense.iterateScore();
+            int currScore = this.offense.iterateScore(pointRet);
 
             //add end game logic
             this.scoreTracker.updateScoreBoard(this.offense.getTeamID(), currScore);
+        }
+        else if (pointRet == -3) {
+            Debug.Log("Point");
+            int currScore = this.defense.iterateScore(3);
+
+            //add end game logic
+            this.scoreTracker.updateScoreBoard(this.defense.getTeamID(), currScore);           
         }
         iterateTurnCounter();
     }

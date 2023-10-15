@@ -40,8 +40,8 @@ public class Team : MonoBehaviour
         LeftDie.GetComponent<DieActions>().gameManager = this.gameManager;
     }
 
-    public int iterateScore() {
-        this.score++;
+    public int iterateScore(int val) {
+        this.score += val;
         return this.score;
     }
 

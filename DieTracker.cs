@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class DieTracker : MonoBehaviour
 {
+    private bool cupCheck;
+    private bool wrongCupCheck;
     private bool heightCheck;
     private bool tableCheck;
     private bool dieLock;
@@ -16,6 +18,7 @@ public class DieTracker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        this.cupCheck = false;
         this.heightCheck = false;
         this.tableCheck = false;
         this.dieLock = false;
@@ -31,17 +34,20 @@ public class DieTracker : MonoBehaviour
     }
 
     public void wrongTable () {
-        this.wrongTableCheck = true;
-        killActiveDie();
+        // Only if you hit the wrong side of the table first
+        if (!this.tableCheck) {
+            this.wrongTableCheck = true;
+            killActiveDie();
+        }
     }
 
     public void passTableCheck () {
         this.tableCheck = true;
         killActiveDie();
     }
-
+    // The only check that won't kill the die because we don't want it stopping at the 
+    // the vertex
     public void passHeightCheck () {
-        Debug.Log("HEIGHT CHECK");
         this.heightCheck = true;
     }
 
@@ -50,14 +56,32 @@ public class DieTracker : MonoBehaviour
         killActiveDie();
     }
 
-    public bool checkForScore () {
-        if (this.tableCheck && this.heightCheck && this.groundCheck && !this.wrongTableCheck) {
-            return true;
+    public void passCupCheck () {
+        this.cupCheck = true;
+        killActiveDie();
+    }
+    
+    public void wrongCup () {
+        this.wrongCupCheck = true;
+        killActiveDie();
+    }
+
+    public int checkForScore () {
+        if (this.wrongCupCheck) {
+            return -3;
+        }
+        if (this.heightCheck && !this.wrongTableCheck) {
+            if (this.cupCheck) {
+                return 3;
+            }
+            if (this.tableCheck && this.groundCheck) {
+                return 1;
+            }
         }
         if (this.heightCheck == false) {
             skyTrigger.flashRed();
         }
-        return false;
+        return 0;
     }
 
     public void killActiveDie() {
@@ -68,7 +92,9 @@ public class DieTracker : MonoBehaviour
         this.tableCheck = false;
         this.heightCheck = false;
         this.groundCheck = false;
+        this.cupCheck = false;
         this.wrongTableCheck = false;
+        this.wrongCupCheck = false;
         StartCoroutine(destroyDie(this.currentDie));
         this.dieLock = false;
         this.currentDie = null;
